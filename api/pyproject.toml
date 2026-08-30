@@ -20,3 +20,9 @@ select = [
 [tool.ruff.format]
 quote-style = "single"
 indent-style = "space"
+
+[tool.pytest.ini_options]
+markers = [
+    "unit: marks tests as unit tests",
+    "e2e: marks tests as end-to-end tests",
+]

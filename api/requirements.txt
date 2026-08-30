@@ -5,3 +5,5 @@ httpx>=0.27
 pydantic-ai>=0.4
 
 pydantic
+
+pytest>=8.0

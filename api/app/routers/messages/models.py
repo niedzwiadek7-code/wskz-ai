@@ -14,9 +14,11 @@ class MessageRequest(BaseModel):
         min_length=1,
     )
 
+
 class MessageResult(BaseModel):
     success: bool
     tool_result: ToolCallResult
+
 
 class Department(StrEnum):
     HUMAN_RESOURCES = 'human resources'

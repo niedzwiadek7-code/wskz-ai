@@ -16,6 +16,8 @@ class Settings(BaseSettings):
 
     # email envs
     email_from: str = 'info@wskz.pl'
+    e2e_mail_provider: str = 'mailhog'
+    e2e_mailhog_url: str = 'http://localhost:8025'
 
 
 @lru_cache
