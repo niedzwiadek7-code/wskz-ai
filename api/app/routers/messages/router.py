@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.config import Settings, get_settings
-from app.routers.messages.models import MessageRequest
+from app.routers.messages.models import MessageRequest, MessageResult
 from app.routers.messages.service import process_received_message
 
 router = APIRouter()
@@ -19,16 +19,19 @@ router = APIRouter()
 async def process_message(
     payload: MessageRequest,
     settings: Settings = Depends(get_settings),
-):
+) -> MessageResult:
     try:
         result = await process_received_message(
             payload,
             settings,
         )
 
-        return {
-            'success': True,
-            'tool_result': result,
-        }
+        return MessageResult(
+            success=True,
+            tool_result=result,
+        )
     except Exception as e:
-        return {'error': str(e)}
+        raise HTTPException(
+            status_code=500,
+            detail=str(e),
+        )
