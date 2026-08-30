@@ -7,3 +7,5 @@ pydantic-ai>=0.4
 pydantic
 
 pytest>=8.0
+
+ruff>=0.16.5

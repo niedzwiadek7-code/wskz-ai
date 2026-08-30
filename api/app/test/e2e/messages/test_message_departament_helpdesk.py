@@ -4,8 +4,8 @@ import time
 import httpx
 import pytest
 
-from app.routers.messages.models import Department
 from app.services.email.base import EmailService, _normalise, _subject
+from app.services.messages.models import Department
 from app.test.e2e.utils import parse_body
 
 API_URL = os.getenv('E2E_API_URL', 'http://localhost:8000')

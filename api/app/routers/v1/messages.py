@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.config import Settings, get_settings
-from app.routers.messages.models import MessageRequest, MessageResult
-from app.routers.messages.service import process_received_message
+from app.services.messages.base import process_received_message
+from app.services.messages.models import MessageRequest, MessageResult
 
 router = APIRouter()
 

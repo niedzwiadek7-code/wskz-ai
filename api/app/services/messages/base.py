@@ -1,9 +1,13 @@
 from pydantic_ai import ModelSettings
 
 from app.config import Settings
-from app.routers.messages.models import Department, MessageRequest
-from app.routers.messages.prompts import ASSIGN_MESSAGE_TO_SECTION_PROMPT, SEND_EMAIL_DESCRIPTION, USER_MESSAGE_PROMPT
 from app.services.email.base import EmailService
+from app.services.messages.models import Department, MessageRequest
+from app.services.messages.prompts import (
+    ASSIGN_MESSAGE_TO_SECTION_PROMPT,
+    SEND_EMAIL_DESCRIPTION,
+    USER_MESSAGE_PROMPT,
+)
 from app.services.route_agent.base import RouteAgentService
 from app.services.route_agent.models import AgentTool, ToolCallResult
 

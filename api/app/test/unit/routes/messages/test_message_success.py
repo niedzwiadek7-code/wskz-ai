@@ -1,6 +1,10 @@
 import pytest
 
-from app.routers.messages.prompts import ASSIGN_MESSAGE_TO_SECTION_PROMPT, SEND_EMAIL_DESCRIPTION, USER_MESSAGE_PROMPT
+from app.services.messages.prompts import (
+    ASSIGN_MESSAGE_TO_SECTION_PROMPT,
+    SEND_EMAIL_DESCRIPTION,
+    USER_MESSAGE_PROMPT,
+)
 from app.services.route_agent.models import ToolCallResult
 
 

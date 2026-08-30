@@ -4,7 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.routers.messages import service as messages_service
+from app.services.messages import base as messages_service
 
 
 class FakeRouteAgentService:
