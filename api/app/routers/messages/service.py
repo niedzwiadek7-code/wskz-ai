@@ -5,7 +5,7 @@ from app.routers.messages.models import Department, MessageRequest
 from app.routers.messages.prompts import ASSIGN_MESSAGE_TO_SECTION_PROMPT, SEND_EMAIL_DESCRIPTION, USER_MESSAGE_PROMPT
 from app.services.email.base import EmailService
 from app.services.route_agent.base import RouteAgentService
-from app.services.route_agent.models import AgentTool
+from app.services.route_agent.models import AgentTool, ToolCallResult
 
 _DEPARTMENT_TO_EMAIL = {
     Department.HUMAN_RESOURCES: 'human-resources@example.com',
@@ -19,7 +19,7 @@ _DEPARTMENT_TO_EMAIL = {
 async def process_received_message(
     payload: MessageRequest,
     settings: Settings,
-) -> None:
+) -> ToolCallResult:
     async def send_email(
         department: Department,
         subject: str,
@@ -36,7 +36,7 @@ async def process_received_message(
         except Exception as e:
             raise ValueError(f'Failed to send email: {e}')
 
-    await (
+    result = await (
         RouteAgentService(settings)
         .build_agent(
             system_prompt=ASSIGN_MESSAGE_TO_SECTION_PROMPT,
@@ -54,3 +54,5 @@ async def process_received_message(
         )
         .run(USER_MESSAGE_PROMPT.format(email=payload.email, message=payload.message))
     )
+
+    return result

@@ -1,16 +1,20 @@
 import functools
+import inspect
 from collections.abc import Callable
+from typing import Any
 
 from pydantic_ai import Agent, ModelSettings
 from pydantic_ai.models.openai import OpenAIResponsesModel, OpenAIResponsesModelSettings
 from pydantic_ai.providers.openai import OpenAIProvider
 
 from app.config import Settings
-from app.services.route_agent.models import AgentTool
+from app.services.route_agent.models import AgentTool, ToolCallResult
 
 
 class ToolExecuted(Exception):
-    def __init__(self, result):
+    def __init__(self, tool_name: str, params: dict[str, Any], result: Any):
+        self.tool_name = tool_name
+        self.params = params
         self.result = result
 
 
@@ -46,13 +50,22 @@ class RouteAgentService:
         return self
 
     def wrap_tool(self, tool: AgentTool) -> Callable:
-        async def wrapper(*args, **kwargs):
-            result = tool.func(*args, **kwargs)
+        sig = inspect.signature(tool.func)
 
+        async def wrapper(*args, **kwargs):
+            bound = sig.bind(*args, **kwargs)
+            bound.apply_defaults()
+            params = dict(bound.arguments)
+
+            result = tool.func(*args, **kwargs)
             if hasattr(result, '__await__'):
                 result = await result
 
-            raise ToolExecuted(result)
+            raise ToolExecuted(
+                tool_name=tool.name,
+                params=params,
+                result=result,
+            )
 
         functools.wraps(tool.func)(wrapper)
         wrapper.__name__ = tool.name
@@ -60,11 +73,17 @@ class RouteAgentService:
 
         return wrapper
 
-    async def run(self, message: str) -> None:
+    async def run(self, message: str) -> ToolCallResult:
         if not self.agent:
             raise ValueError('Agent not built')
 
         try:
             await self.agent.run(message)
         except ToolExecuted as exc:
-            return exc.result
+            return ToolCallResult(
+                tool_name=exc.tool_name,
+                params=exc.params,
+                result=exc.result,
+            )
+
+        raise RuntimeError('Agent finished without calling the tool')

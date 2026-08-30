@@ -21,11 +21,14 @@ async def process_message(
     settings: Settings = Depends(get_settings),
 ):
     try:
-        await process_received_message(
+        result = await process_received_message(
             payload,
             settings,
         )
 
-        return {'success': True}
+        return {
+            'success': True,
+            'tool_result': result,
+        }
     except Exception as e:
         return {'error': str(e)}
