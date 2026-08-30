@@ -1,0 +1,22 @@
+[project]
+name = "llm"
+version = "0.1.0"
+description = "Llm service"
+requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I",
+    "UP",
+    "T201",
+]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"

@@ -1,0 +1,71 @@
+services:
+  api:
+    build:
+      context: ./api
+    container_name: wskz-ai-api
+    ports:
+      - "8000:8000"
+    environment:
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen3:4b}
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+    depends_on:
+      mailhog:
+        condition: service_started
+      ollama-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - ./api:/app
+    restart: unless-stopped
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: wskz-ai-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama
+    container_name: wskz-ai-ollama
+    ports:
+      - "11435:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    deploy:
+       resources:
+         reservations:
+           devices:
+             - driver: nvidia
+               count: all
+               capabilities: [gpu]
+    restart: unless-stopped
+
+  ollama-init:
+    image: ollama/ollama
+    container_name: wskz-ai-ollama-init
+    depends_on:
+      - ollama
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    entrypoint: >
+      sh -c "
+        sleep 5 &&
+        ollama pull ${OLLAMA_MODEL:-qwen3:4b}
+      "
+    restart: "no"
+
+volumes:
+  ollama_data:
